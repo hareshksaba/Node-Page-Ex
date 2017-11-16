@@ -1,18 +1,25 @@
 var http = require('http');
 var url = require("url");
 var querystring = require('querystring');
+var EventEmitter = require('events').EventEmitter;
 
 
 var server = http.createServer(function(req,res){
     var params = querystring.parse(url.parse(req.url).query);
     var page = url.parse(req.url).pathname;
+    var game = new EventEmitter();  
     console.log(page);
+    game.on('gameover', function(message){
+        console.log(message);
+
+    })
     res.writeHead(200, {"Content-Type": "text/plain"});
     if ('firstname' in params && 'lastname' in params){
         res.write('Your name is '+ params['firstname']+ ' ' + params['lastname']);
     }
     else{
         res.write('You do have a first name and a last name, don\'t you?');
+        game.emit('gameover','You loose!');
     }
     if (page == '/') {
     res.write('\nYou\'re at the reception desk. How can I help you?');
@@ -25,7 +32,12 @@ var server = http.createServer(function(req,res){
     }
     else{
         res.writeHead(404, {"Content-Type": "text/plain"});
+        server.close();
     }
     res.end();
+
+    server.on('close', function(){
+        console.log("Goodbye");
+    })
 });
 server.listen(8080);
