@@ -2,6 +2,8 @@ var http = require('http');
 var url = require("url");
 var querystring = require('querystring');
 var EventEmitter = require('events').EventEmitter;
+var mymodule = require('./mymodule');
+
 
 
 var server = http.createServer(function(req,res){
@@ -9,6 +11,7 @@ var server = http.createServer(function(req,res){
     var page = url.parse(req.url).pathname;
     var game = new EventEmitter();  
     console.log(page);
+    mymodule.sayHello();
     game.on('gameover', function(message){
         console.log(message);
 
@@ -38,6 +41,7 @@ var server = http.createServer(function(req,res){
 
     server.on('close', function(){
         console.log("Goodbye");
+        mymodule.sayGoodbye();
     })
 });
 server.listen(8080);
